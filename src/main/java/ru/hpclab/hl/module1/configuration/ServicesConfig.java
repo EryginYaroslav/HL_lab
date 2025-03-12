@@ -1,30 +1,24 @@
 package ru.hpclab.hl.module1.configuration;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import ru.hpclab.hl.module1.helper.UserHelper;
+import ru.hpclab.hl.module1.model.User;
+import ru.hpclab.hl.module1.repository.UserRepository;
 import ru.hpclab.hl.module1.service.StatisticsService;
 import ru.hpclab.hl.module1.service.UserService;
 
-@EnableAutoConfiguration
-@EnableScheduling
-@EnableAsync
-@PropertySource("application.properties")
+import java.util.UUID;
+
 @Configuration
-public class DefaultConfiguration {
+public class ServicesConfig {
 
     @Bean
-    UserService userService() {
-        UserService userService = new UserService();
+    UserService userService(UserRepository userRepository) {
+        UserService userService = new UserService(userRepository);
         for (int i = 0; i < 5; i++) {
-            UserHelper.addNewRandomUser();
+            userRepository.save(new User(UUID.randomUUID(), "new super user"));
         }
-        userService.setUsers(UserHelper.allUsers());
         return userService;
     }
 
