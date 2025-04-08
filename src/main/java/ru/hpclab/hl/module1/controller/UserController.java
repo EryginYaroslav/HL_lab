@@ -8,7 +8,7 @@ import ru.hpclab.hl.module1.service.UserService;
 import java.util.List;
 
 @RestController
-public class UserController {
+public class  UserController {
 
     private final UserService userService;
 
