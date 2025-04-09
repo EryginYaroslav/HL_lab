@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db-init:
+    build: ./db-init-generator
+    volumes:
+      - db_init_scripts:/sql-init
+    # Команда запуска (CMD в Dockerfile выполнится, если здесь не указан иной command)
+    command: python db_init_generator.py
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fitnesstrackerdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - db_init_scripts:/docker-entrypoint-initdb.d
+    depends_on:
+      - db-init
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fitnesstrackerdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - postgres
+
+volumes:
+  db_data:
+  db_init_scripts:
